@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>    
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
-	    <link rel="stylesheet" type="text/css" href="css/jquery.jqtimeline.css" />
+	    <link rel="stylesheet" type="text/css" href="css/timeline.css" />
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-        <script type="text/javascript" src="js/jquery.jqtimeline.js"></script>
+        <script type="text/javascript" src="js/timeline.js"></script>
     </head>
 	<body>
 		<div class="header" style="margin-bottom:20px">
@@ -54,7 +54,7 @@
 						}]
 			var tl = $('#myTimeline').jqtimeline({
 							events : ev,
-							click:function(e,event){
+							change:function(event){
 								alert(event.id + ": " + event.name);
 							}
 						});
