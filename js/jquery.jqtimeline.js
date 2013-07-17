@@ -81,9 +81,7 @@
 			}
 		}
 		_this.start = start;
-		console.log("start: " + start);
 		_this.end = end;
-		console.log("end: " + end);
 	};
 
 	jqTimeLine.prototype._generateMarkup = function() {
@@ -189,7 +187,11 @@
 					for (var i = 0; i < neighborEvents.length; i++) {
 						var $temp = $(neighborEvents[i]);
 						var oData = $temp.data('event');
-						strToolTip = strToolTip + '<div class="msg" id="msg_'+oData.id+'">'+oData.on.toISOString()+' : '+ oData.name +'</div>';
+						var name = '';
+						if(oData.name){
+							name = ' : '+ oData.name;
+						}
+						strToolTip = strToolTip + '<div class="msg" id="msg_'+oData.id+'">'+oData.on.toISOString()+ name +'</div>';
 					};
 					_this._showToolTip(nLeft,strToolTip,eObj.id,false);
 				}
