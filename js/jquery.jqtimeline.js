@@ -1,6 +1,8 @@
 /*!
  * jqtimeline Plugin
  * http://goto.io/jqtimeline
+ * 
+ * Modified by Tony Zhu to show a series of selectable time events
  *
  * Copyright 2013 goto.io
  * Released under the MIT license
