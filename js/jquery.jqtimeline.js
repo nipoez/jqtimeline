@@ -152,9 +152,12 @@
 		if(e.selected){
 			_this._selected = e.id;
 			$retHtml.addClass("selected");
+			if(_this.options.change){
+				_this.options.change(e);
+			}
 		}
 		$retHtml.data('eventInfo',_this._aEvents[e.id]);
-		if(_this.options.click){
+		if(_this.options.click || _this.options.change){
 			_this._addEventListner($retHtml,'click');
 		}
 		if(_this.options.showToolTip){
@@ -225,6 +228,9 @@
 					$oldSelected.removeClass("selected");
 					$targetObj.addClass("selected");
 					_this._selected = eventId;
+					if(_this.options.change){
+						_this.options.change(_this._aEvents[eventId]);
+					}
 				}
 				var $tooltipEl = $('#tooltip_' + eventId);
 				var $msgs = $('.msg',$tooltipEl);
