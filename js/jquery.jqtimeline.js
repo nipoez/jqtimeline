@@ -20,6 +20,7 @@
 		this.options = $.extend({}, defaults, options);
 		this.$el = $(element);
 		this._defaults = defaults;
+		this._selected = null;
 		this.start = new Date();
 		this.end = new Date();
 		this._name = pluginName;
@@ -148,6 +149,10 @@
 		var containerWidth = _this._totalWidth - 30;
 		var leftVal = Math.ceil(_this._offset_x + containerWidth * leftPecentage - _this._eDotWidth/2);
 		var $retHtml = $('<div class="event" id="event_'+e.id+'" style="left:'+leftVal+'px">&nbsp;</div>').data('event',e);
+		if(e.selected){
+			_this._selected = e.id;
+			$retHtml.addClass("selected");
+		}
 		$retHtml.data('eventInfo',_this._aEvents[e.id]);
 		if(_this.options.click){
 			_this._addEventListner($retHtml,'click');
@@ -210,6 +215,13 @@
 			$retHtml.click(function(e){
 				var $targetObj = $(this);
 				var eventId = $targetObj.data('event').id;
+				// Handle selected
+				if(eventId != _this._selected){
+					$oldSelected = $("#event_" + _this._selected);
+					$oldSelected.removeClass("selected");
+					$targetObj.addClass("selected");
+					_this._selected = eventId;
+				}
 				var $tooltipEl = $('#tooltip_' + eventId);
 				var $msgs = $('.msg',$tooltipEl);
 				if($msgs.length == 1){
