@@ -17,7 +17,7 @@
 					var ev = [{
 							id : 1,
 							name : "Joined Faecbook",
-							on : new Date(2011,2,15)
+							on : new Date(2011,2,15, 13, 5, 8)
 						},{
 							id : 11,
 							name : "Updated my first status message",
@@ -57,8 +57,6 @@
 						}]
 			var tl = $('#myTimeline').jqtimeline({
 							events : ev,
-							numYears:4,
-							startYear:2011,
 							click:function(e,event){
 								alert(event.name);
 							}

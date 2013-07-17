@@ -10,24 +10,21 @@
 (function($) {
 	var pluginName = 'jqTimeline',
 		defaults = {
-			startYear : (new Date()).getFullYear() -1 , // Start with one less year by default
-			numYears : 3,
-			gap : 25, // gap between lines
 			showToolTip : true,
 			groupEventWithinPx : 6, // Will show common tooltip for events within this range of px
 			events : [],
 			click : null //Handler for click event for event
-		},
-	aMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		};
 
 	function jqTimeLine(element, options) {
 		this.options = $.extend({}, defaults, options);
 		this.$el = $(element);
 		this._defaults = defaults;
+		this.start = new Date();
+		this.end = new Date();
 		this._name = pluginName;
 		this._offset_x = 14; // Starting position of the line
-		this._current_offset_x = 14; // var used for laying out months to the hor line
-		this._gap = this.options.gap; 
+		this._totalWidth = this.$el.width();
 		this._eDotWidth = 16; // Width of the event dot shown in the ui
 		this._$toolTip = null; // use to have reference of the tooltip
 		this._a$Events = []; // will store all jquery elements of events, marked on the timeline
@@ -39,6 +36,7 @@
 
 	jqTimeLine.prototype.init = function() {
 		_this = this;
+		this._calculateStartEnd();
 		this._generateMarkup();
 		//Attach a event handler to global container
 		if(_this.options.click){
@@ -61,49 +59,53 @@
 		}
 	};
 
+	jqTimeLine.prototype._calculateStartEnd = function() {
+		var _this = this;
+		var start = null;
+		var end = null;
+		if(_this.options.events.length < 1){
+			return;
+		}else{
+			start = this.options.events[0].on;
+			end = this.options.events[0].on;
+		}
+		for(var k=0;k<_this.options.events.length;k++){
+			var e = _this.options.events[k];
+			var d = e.on;
+			if(d < start){
+				start = d;
+			}
+			if(d > end){
+				end = d;
+			}
+		}
+		_this.start = start;
+		console.log("start: " + start);
+		_this.end = end;
+		console.log("end: " + end);
+	};
+
 	jqTimeLine.prototype._generateMarkup = function() {
 		var _this = this;
 		var i = 0,j=0;
-		var totalWidth = _this.options.numYears * this._gap * 12 + 3;
-		var containerWidth = totalWidth + 30;
+		var totalWidth = _this._totalWidth;
+		var containerWidth = totalWidth - 30;
 		var $mainContainer = this.$mainContainer = $(
-			'<div class="gt-timeline" style="width:'+containerWidth+'px">' + 
-				'<div class="main_line" style="width:'+totalWidth+'px"></div>' + 
+			'<div class="gt-timeline" style="width:'+totalWidth+'px">' + 
+				'<div class="main_line" style="width:'+containerWidth+'px"></div>' + 
 			'</div>'
 		);
-		for(j=0;j<_this.options.numYears;j++){
-			for(i=0;i<12;i++){
-				$mainContainer.append(_this._getMonthMarkup(i,_this.options.startYear + j));
-			}
-		}
-		$mainContainer.append(_this._getMonthMarkup(0,_this.options.startYear + _this.options.numYears));
+
 		//Start adding events
 		for(var k=0;k<_this.options.events.length;k++){
 			var e = _this.options.events[k];
 			var d = e.on;
-			if(d.getFullYear() >= _this.options.startYear && d.getFullYear() < _this.options.startYear + _this.options.numYears){
+			if(d >= _this.start && d <= _this.end){
 				$mainContainer.append(_this._getEventMarkup(e));
 			}
 		}
 		_this.$el.append($mainContainer);
 	};
-
-	jqTimeLine.prototype._getMonthMarkup = function(num,year){
-		var _this = this;
-		var retStr = "";
-		if(num== 0){
-			retStr='<div class="horizontal-line leftend" style="left:'+_this._current_offset_x+'px">' + 
-						'<div class="year">'+year+'</div>' + 
-						'<div class="month">Jan</div>' + 
-					'</div>';
-		}else if(num%2 == 1){
-			retStr = '<div class="horizontal-line month-line odd-month" style="left:'+_this._current_offset_x+'px"></div>';
-		}else{
-			retStr = '<div class="horizontal-line month-line even-month" style="left:'+_this._current_offset_x+'px"><div class="month">'+aMonths[num]+'</div></div>';
-		}
-		_this._current_offset_x += _this._gap;
-		return retStr;
-	}
 
 	jqTimeLine.prototype._getGenId = function(){
 		var _this = this;
@@ -142,12 +144,9 @@
 		if(typeof e.id === 'undefined') e.id = _this._getGenId();
 		_this._aEvents[e.id] = e; //Add event to event array
 		var eName = e.name;
-		var d = e.on;
-		var n = d.getDate();
-		var yn = d.getFullYear() - _this.options.startYear;
-		var mn = d.getMonth();
-		var totalMonths = (yn * 12) + mn;
-		var leftVal = Math.ceil(_this._offset_x + totalMonths * _this.options.gap + (_this.options.gap/31)*n - _this._eDotWidth/2);
+		var leftPecentage = (e.on - _this.start) / (_this.end - _this.start);
+		var containerWidth = _this._totalWidth - 30;
+		var leftVal = Math.ceil(_this._offset_x + containerWidth * leftPecentage - _this._eDotWidth/2);
 		var $retHtml = $('<div class="event" id="event_'+e.id+'" style="left:'+leftVal+'px">&nbsp;</div>').data('event',e);
 		$retHtml.data('eventInfo',_this._aEvents[e.id]);
 		if(_this.options.click){
@@ -185,7 +184,7 @@
 					for (var i = 0; i < neighborEvents.length; i++) {
 						var $temp = $(neighborEvents[i]);
 						var oData = $temp.data('event');
-						strToolTip = strToolTip + '<div class="msg" id="msg_'+oData.id+'">'+oData.on.toDateString()+' : '+ oData.name +'</div>';
+						strToolTip = strToolTip + '<div class="msg" id="msg_'+oData.id+'">'+oData.on.toISOString()+' : '+ oData.name +'</div>';
 					};
 					_this._showToolTip(nLeft,strToolTip,eObj.id,false);
 				}
