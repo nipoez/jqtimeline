@@ -42,13 +42,24 @@
 		this._calculateStartEnd();
 		this._generateMarkup();
 		//Attach a event handler to global container
-		if(_this.options.click){
+		if(_this.options.click || _this.options.change){
 			_this.$mainContainer.on('click',function(e){
 				var $t = $(e.target);
 				if($t.hasClass('event') || $t.hasClass('msg')){
 					//In both the cases eventId is stored in the format msg_eventid or event_eventid
 					var eventId = $t.attr('id').split("_")[1];
-					_this.options.click(e,_this._aEvents[eventId]);
+					if(_this.options.click){
+						_this.options.click(e,_this._aEvents[eventId]);
+					}else{
+						if(eventId != _this.selected){
+							$oldSelected = $("#event_" + _this._selected);
+							$oldSelected.removeClass("selected");
+							$newSelected = $("#event_" + eventId);
+							$newSelected.addClass("selected");
+							_this._selected = eventId;
+							_this.options.change(_this._aEvents[eventId]);
+						}
+					}
 				}
 				if($t.hasClass('closeTooltip')){
 					//we may need to close the tooltip
@@ -222,16 +233,6 @@
 			$retHtml.click(function(e){
 				var $targetObj = $(this);
 				var eventId = $targetObj.data('event').id;
-				// Handle selected
-				if(eventId != _this._selected){
-					$oldSelected = $("#event_" + _this._selected);
-					$oldSelected.removeClass("selected");
-					$targetObj.addClass("selected");
-					_this._selected = eventId;
-					if(_this.options.change){
-						_this.options.change(_this._aEvents[eventId]);
-					}
-				}
 				var $tooltipEl = $('#tooltip_' + eventId);
 				var $msgs = $('.msg',$tooltipEl);
 				if($msgs.length == 1){
