@@ -32,7 +32,9 @@
 	}
 
 	.gt-timeline div.selected{
-		/*border: 2px dashed #999999;*/
+		top: 42px;
+		border: 2px dashed #999999;
+		background-position: -27px -84px;
 	}
 	.gt-timeline div.e-message{
 		background-color: #666666;
@@ -103,43 +105,4 @@
 	}
 	.gt-timeline div.rightend{
 		right: 0;
-	}
-		.gt-timeline .leftend .year{
-			position: relative;
-			text-align: center;
-			top: -30px;
-			left: -15px;
-		}
-		.gt-timeline .leftend .month{
-			position: relative;
-			text-align: center;
-			top: -32px;
-			left: -11px;
-		}
-
-	.gt-timeline div.month-line{
-		height: 15px;
-		border-left: 2px solid #666666;
-	}
-
-	.gt-timeline div.even-month{
-		top:37px;
-	}
-		.gt-timeline div.even-month .month{
-			position: relative;
-			top: -18px;
-			left: -10px;
-		}
-
-	.gt-timeline div.odd-month{
-		top: 41px;
-		height: 10px;
-		border-left: 1px solid #999999;
-	}
-
-	.gt-timeline .year, .gt-timeline .month{
-		font-size: 12px;
-	}
-	.gt-timeline .year{
-		font-weight: bold;
 	}
